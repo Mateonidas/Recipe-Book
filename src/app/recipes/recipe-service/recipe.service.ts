@@ -9,27 +9,33 @@ import {Subject} from 'rxjs';
 })
 export class RecipeService {
   recipesChanged = new Subject<Recipe[]>();
+  private recipes: Recipe[] = [];
 
-  private recipes: Recipe[] = [
-    new Recipe(
-      'A Test Recipe',
-      'Test description',
-      'https://iamafoodblog.b-cdn.net/wp-content/uploads/2020/05/homemade-birria-tacos-recipe-3273w-1024x683.jpg',
-      [
-        new Ingredient('Meat', 1),
-        new Ingredient('French Fries', 20),
-      ]),
-    new Recipe(
-      'Another Test Recipe',
-      'Another description',
-      'https://iamafoodblog.b-cdn.net/wp-content/uploads/2020/05/homemade-birria-tacos-recipe-3273w-1024x683.jpg',
-      [
-        new Ingredient('Buns', 2),
-        new Ingredient('French Meat', 1),
-      ])
-  ];
+  // private recipes: Recipe[] = [
+  //   new Recipe(
+  //     'A Test Recipe',
+  //     'Test description',
+  //     'https://iamafoodblog.b-cdn.net/wp-content/uploads/2020/05/homemade-birria-tacos-recipe-3273w-1024x683.jpg',
+  //     [
+  //       new Ingredient('Meat', 1),
+  //       new Ingredient('French Fries', 20),
+  //     ]),
+  //   new Recipe(
+  //     'Another Test Recipe',
+  //     'Another description',
+  //     'https://iamafoodblog.b-cdn.net/wp-content/uploads/2020/05/homemade-birria-tacos-recipe-3273w-1024x683.jpg',
+  //     [
+  //       new Ingredient('Buns', 2),
+  //       new Ingredient('French Meat', 1),
+  //     ])
+  // ];
 
   constructor(private shoppingListService: ShoppingListService) {
+  }
+
+  setRecipes(recipes: Recipe[]) {
+    this.recipes = recipes;
+    this.recipesChanged.next(this.recipes.slice())
   }
 
   getRecipes() {
