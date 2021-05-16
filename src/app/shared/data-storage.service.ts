@@ -1,15 +1,18 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {RecipeService} from '../recipes/recipe-service/recipe.service';
 import {Recipe} from '../recipes/recipe.model';
-import {map, tap} from 'rxjs/operators';
+import {exhaustMap, map, take, tap} from 'rxjs/operators';
+import {AuthService} from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataStorageService {
 
-  constructor(private http: HttpClient, private recipeService: RecipeService) {
+  constructor(private http: HttpClient,
+              private recipeService: RecipeService,
+              private authService: AuthService) {
   }
 
   storeRecipes() {
@@ -22,9 +25,13 @@ export class DataStorageService {
   }
 
   fetchRecipes() {
+
     return this.http
-      .get<Recipe[]>('https://recipe-book-644f4-default-rtdb.firebaseio.com/recipes.json')
-      .pipe(map(recipes => {
+      .get<Recipe[]>(
+        'https://recipe-book-644f4-default-rtdb.firebaseio.com/recipes.json',
+      )
+      .pipe(
+        map(recipes => {
           return recipes.map(recipe => {
             //if recope doesn't has ingredients, initialize empty array
             return {...recipe, ingredients: recipe.ingredients ? recipe.ingredients : []};
@@ -32,7 +39,28 @@ export class DataStorageService {
         }),
         tap(recipes => {
           this.recipeService.setRecipes(recipes);
-        })
-      );
+        }));
+
+    // return this.authService.user.pipe(
+    //   take(1),
+    //   exhaustMap(user => {
+    //     return this.http
+    //       .get<Recipe[]>(
+    //         'https://recipe-book-644f4-default-rtdb.firebaseio.com/recipes.json',
+    //         {
+    //           params: new HttpParams().set('auth', user.token)
+    //         }
+    //       );
+    //   }),
+    //   map(recipes => {
+    //     return recipes.map(recipe => {
+    //       //if recope doesn't has ingredients, initialize empty array
+    //       return {...recipe, ingredients: recipe.ingredients ? recipe.ingredients : []};
+    //     });
+    //   }),
+    //   tap(recipes => {
+    //     this.recipeService.setRecipes(recipes);
+    //   })
+    // );
   }
 }
